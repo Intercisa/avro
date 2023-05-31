@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+
+app:
+  topic:
+    write_topic: AVRO_WRITE
+
+spring:
+  kafka:
+    producer:
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
+  application-id: avro-enricher
+  cloud:
+    stream:
+      function:
+        definition: processAvro
+      bindings:
+        processAvro-in-0:
+          destination: AVRO_WRITE
+          content-type: application/*+avro
+        processAvro-out-0:
+          destination: AVRO_ENRICHED
+          content-type: application/*+avro
